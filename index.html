@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgroApoio - Conectando Agricultores e Consumidores</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, #2e7d32, #4caf50);
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+        }
+
+        .logo::before {
+            content: "🌱";
+            margin-right: 10px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #c8e6c9;
+        }
+
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #4caf50;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: white;
+            border: 2px solid white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        /* Main Content */
+        main {
+            margin-top: 80px;
+        }
+
+        .hero {
+            background: linear-gradient(rgba(46, 125, 50, 0.8), rgba(76, 175, 80, 0.8)), url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 600"><rect fill="%23a5d6a7" width="1200" height="600"/><path fill="%23388e3c" d="M0,300 Q300,200 600,300 T1200,300 L1200,600 L0,600 Z"/></svg>');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            text-align: center;
+            padding: 4rem 0;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .categories {
+            padding: 4rem 0;
+            background: #f8f9fa;
+        }
+
+        .categories h2 {
+            text-align: center;
+            margin-bottom: 3rem;
+            font-size: 2.5rem;
+            color: #2e7d32;
+        }
+
+        .category-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .category-card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .category-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .category-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .category-card h3 {
+            color: #2e7d32;
+            margin-bottom: 1rem;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            padding: 1.5rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+
+        .product-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .product-card h4 {
+            color: #2e7d32;
+            margin-bottom: 0.5rem;
+        }
+
+        .product-price {
+            font-weight: bold;
+            color: #4caf50;
+            font-size: 1.2rem;
+        }
+
+        .farmer-info {
+            background: #e8f5e8;
+            padding: 1rem;
+            border-radius: 5px;
+            margin-top: 1rem;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 500px;
+            position: relative;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .close {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #999;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        .form-group textarea {
+            height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        footer {
+            background: #2e7d32;
+            color: white;
+            text-align: center;
+            padding: 2rem 0;
+            margin-top: 4rem;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .category-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .auth-buttons {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="container">
+            <div class="logo">AgroApoio</div>
+            <div class="nav-links">
+                <a href="#home" onclick="showSection('home')">Início</a>
+                <a href="#products" onclick="showSection('products')">Produtos</a>
+                <a href="#about">Sobre</a>
+                <a href="#contact">Contato</a>
+            </div>
+            <div class="auth-buttons">
+                <button class="btn btn-secondary" onclick="openModal('loginModal')">Entrar</button>
+                <button class="btn btn-primary" onclick="openModal('registerModal')">Cadastrar</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Home Section -->
+        <section id="home" class="home-section">
+            <div class="hero">
+                <div class="container">
+                    <h1>Conectando Agricultores e Consumidores</h1>
+                    <p>Descubra produtos frescos diretamente dos pequenos produtores da sua região</p>
+                    <button class="btn btn-primary" onclick="showSection('products')">Ver Produtos</button>
+                </div>
+            </div>
+
+            <div class="categories">
+                <div class="container">
+                    <h2>Categorias</h2>
+                    <div class="category-grid">
+                        <div class="category-card" onclick="filterProducts('bebidas')">
+                            <div class="category-icon">🥤</div>
+                            <h3>Bebidas</h3>
+                            <p>Sucos naturais, vinhos artesanais e outras bebidas</p>
+                        </div>
+                        <div class="category-card" onclick="filterProducts('verduras')">
+                            <div class="category-icon">🥬</div>
+                            <h3>Verduras</h3>
+                            <p>Folhas frescas direto da horta</p>
+                        </div>
+                        <div class="category-card" onclick="filterProducts('legumes')">
+                            <div class="category-icon">🥕</div>
+                            <h3>Legumes</h3>
+                            <p>Legumes frescos e orgânicos</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Products Section -->
+        <section id="products" class="products-section hidden">
+            <div class="container">
+                <h2>Produtos Disponíveis</h2>
+                <div class="form-group">
+                    <select id="categoryFilter" onchange="filterProducts(this.value)">
+                        <option value="">Todas as categorias</option>
+                        <option value="bebidas">Bebidas</option>
+                        <option value="verduras">Verduras</option>
+                        <option value="legumes">Legumes</option>
+                    </select>
+                </div>
+                <div id="productsGrid" class="products-grid"></div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('loginModal')">&times;</span>
+            <h2>Entrar</h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email:</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Senha:</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="closeModal('loginModal')" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Entrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('registerModal')">&times;</span>
+            <h2>Cadastrar</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="userType">Tipo de usuário:</label>
+                    <select id="userType" required onchange="toggleFarmerFields()">
+                        <option value="">Selecione</option>
+                        <option value="cliente">Cliente</option>
+                        <option value="vendedor">Vendedor/Agricultor</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="registerName">Nome:</label>
+                    <input type="text" id="registerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerEmail">Email:</label>
+                    <input type="email" id="registerEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPhone">Telefone:</label>
+                    <input type="tel" id="registerPhone" required>
+                </div>
+                <div class="form-group">
+                    <label for="registerPassword">Senha:</label>
+                    <input type="password" id="registerPassword" required>
+                </div>
+                <div id="farmerFields" class="hidden">
+                    <div class="form-group">
+                        <label for="farmName">Nome da Propriedade:</label>
+                        <input type="text" id="farmName">
+                    </div>
+                    <div class="form-group">
+                        <label for="farmAddress">Endereço da Propriedade:</label>
+                        <textarea id="farmAddress"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="closeModal('registerModal')" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Cadastrar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Product Modal -->
+    <div id="addProductModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal('addProductModal')">&times;</span>
+            <h2>Adicionar Produto</h2>
+            <form id="addProductForm">
+                <div class="form-group">
+                    <label for="productName">Nome do Produto:</label>
+                    <input type="text" id="productName" required>
+                </div>
+                <div class="form-group">
+                    <label for="productCategory">Categoria:</label>
+                    <select id="productCategory" required>
+                        <option value="">Selecione</option>
+                        <option value="bebidas">Bebidas</option>
+                        <option value="verduras">Verduras</option>
+                        <option value="legumes">Legumes</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productPrice">Preço:</label>
+                    <input type="number" id="productPrice" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label for="productUnit">Unidade:</label>
+                    <select id="productUnit" required>
+                        <option value="kg">kg</option>
+                        <option value="g">g</option>
+                        <option value="unidade">unidade</option>
+                        <option value="litro">litro</option>
+                        <option value="ml">ml</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="productDescription">Descrição:</label>
+                    <textarea id="productDescription"></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" onclick="closeModal('addProductModal')" class="btn btn-secondary">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Adicionar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2025 AgroApoio. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Data storage
+        let users = [];
+        let products = [];
+        let currentUser = null;
+
+        // Initialize with some sample data
+        function initializeData() {
+            products = [
+                {
+                    id: 1,
+                    name: "Alface Orgânica",
+                    category: "verduras",
+                    price: 3.50,
+                    unit: "unidade",
+                    description: "Alface fresca e orgânica",
+                    farmer: {
+                        name: "João Silva",
+                        phone: "(11) 99999-9999",
+                        farm: "Sítio da Serra"
+                    }
+                },
+                {
+                    id: 2,
+                    name: "Cenoura",
+                    category: "legumes",
+                    price: 4.00,
+                    unit: "kg",
+                    description: "Cenoura doce e crocante",
+                    farmer: {
+                        name: "Maria Santos",
+                        phone: "(11) 88888-8888",
+                        farm: "Horta da Maria"
+                    }
+                },
+                {
+                    id: 3,
+                    name: "Suco de Laranja Natural",
+                    category: "bebidas",
+                    price: 8.00,
+                    unit: "litro",
+                    description: "Suco natural sem conservantes",
+                    farmer: {
+                        name: "Pedro Oliveira",
+                        phone: "(11) 77777-7777",
+                        farm: "Fazenda Citrus"
+                    }
+                }
+            ];
+            displayProducts();
+        }
+
+        // Modal functions
+        function openModal(modalId) {
+            document.getElementById(modalId).style.display = 'block';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // Section navigation
+        function showSection(sectionName) {
+            const sections = document.querySelectorAll('main > section');
+            sections.forEach(section => {
+                section.classList.add('hidden');
+            });
+            
+            const targetSection = document.getElementById(sectionName);
+            if (targetSection) {
+                targetSection.classList.remove('hidden');
+            }
+            
+            if (sectionName === 'products') {
+                displayProducts();
+            }
+        }
+
+        // User type toggle
+        function toggleFarmerFields() {
+            const userType = document.getElementById('userType').value;
+            const farmerFields = document.getElementById('farmerFields');
+            
+            if (userType === 'vendedor') {
+                farmerFields.classList.remove('hidden');
+            } else {
+                farmerFields.classList.add('hidden');
+            }
+        }
+
+        // Product filtering
+        function filterProducts(category) {
+            if (category) {
+                showSection('products');
+                document.getElementById('categoryFilter').value = category;
+            }
+            displayProducts(category);
+        }
+
+        // Display products
+        function displayProducts(filterCategory = '') {
+            const productsGrid = document.getElementById('productsGrid');
+            const filteredProducts = filterCategory 
+                ? products.filter(product => product.category === filterCategory)
+                : products;
+
+            productsGrid.innerHTML = '';
+
+            if (filteredProducts.length === 0) {
+                productsGrid.innerHTML = '<p>Nenhum produto encontrado nesta categoria.</p>';
+                return;
+            }
+
+            filteredProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card';
+                productCard.innerHTML = `
+                    <h4>${product.name}</h4>
+                    <p>${product.description}</p>
+                    <div class="product-price">R$ ${product.price.toFixed(2)}/${product.unit}</div>
+                    <div class="farmer-info">
+                        <strong>Produtor:</strong> ${product.farmer.name}<br>
+                        <strong>Propriedade:</strong> ${product.farmer.farm}<br>
+                        <strong>Contato:</strong> ${product.farmer.phone}
+                    </div>
+                `;
+                productsGrid.appendChild(productCard);
+            });
+        }
+
+        // Form handlers
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Simulate login
+            const user = users.find(u => u.email === email && u.password === password);
+            if (user) {
+                currentUser = user;
+                alert('Login realizado com sucesso!');
+                closeModal('loginModal');
+                updateAuthButtons();
+            } else {
+                alert('Email ou senha incorretos!');
+            }
+        });
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const userData = {
+                id: users.length + 1,
+                name: document.getElementById('registerName').value,
+                email: document.getElementById('registerEmail').value,
+                phone: document.getElementById('registerPhone').value,
+                password: document.getElementById('registerPassword').value,
+                type: document.getElementById('userType').value,
+                farmName: document.getElementById('farmName').value,
+                farmAddress: document.getElementById('farmAddress').value
+            };
+            
+            users.push(userData);
+            alert('Cadastro realizado com sucesso!');
+            closeModal('registerModal');
+            
+            // Reset form
+            document.getElementById('registerForm').reset();
+            document.getElementById('farmerFields').classList.add('hidden');
+        });
+
+        document.getElementById('addProductForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const productData = {
+                id: products.length + 1,
+                name: document.getElementById('productName').value,
+                category: document.getElementById('productCategory').value,
+                price: parseFloat(document.getElementById('productPrice').value),
+                unit: document.getElementById('productUnit').value,
+                description: document.getElementById('productDescription').value,
+                farmer: {
+                    name: currentUser.name,
+                    phone: currentUser.phone,
+                    farm: currentUser.farmName || 'Propriedade Rural'
+                }
+            };
+            
+            products.push(productData);
+            alert('Produto adicionado com sucesso!');
+            closeModal('addProductModal');
+            displayProducts();
+            
+            // Reset form
+            document.getElementById('addProductForm').reset();
+        });
+
+        function updateAuthButtons() {
+            const authButtons = document.querySelector('.auth-buttons');
+            if (currentUser) {
+                authButtons.innerHTML = `
+                    <span>Olá, ${currentUser.name}!</span>
+                    ${currentUser.type === 'vendedor' ? '<button class="btn btn-primary" onclick="openModal(\'addProductModal\')">Adicionar Produto</button>' : ''}
+                    <button class="btn btn-secondary" onclick="logout()">Sair</button>
+                `;
+            }
+        }
+
+        function logout() {
+            currentUser = null;
+            location.reload();
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.style.display = 'none';
+            }
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeData();
+        });
+    </script>
+</body>
+</html>
